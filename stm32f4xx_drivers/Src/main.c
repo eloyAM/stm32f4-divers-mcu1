@@ -49,8 +49,11 @@ int main(void)
 	 */
 	SPI2_GPIOInits();
 	SPI2_Inits();
+	// this makes NSS internally HIGH and avoid MODF error
+	SPI_SSIConfig(SPI2, ENABLE);
 	SPI_PeripheralControl(SPI2, ENABLE);
 	SPI_SendData(SPI2, (uint8_t*)"hello", 5);
+	SPI_PeripheralControl(SPI2, DISABLE);
 	while (1) {}
 
 	/*
