@@ -59,8 +59,12 @@ void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
  */
 void SPI_Init(SPI_Handle_t *pSPIHandle)
 {
-	// First, let's configure the SPI_CR1 register
 	uint32_t tempreg = 0;
+
+	// previously -> enable peripheral clock
+	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
+
+	// First, let's configure the SPI_CR1 register
 	// 1. configure the device mode
 	tempreg |= pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR;
 	// 2. Configure the bus config
@@ -152,3 +156,25 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
 	}
 }
 
+/*
+ * SPI Peripheral control
+ */
+/*
+ * @fn			- SPI_PeripheralControl
+ *
+ * @brief		-
+ *
+ * @param[in]	- base address of the SPI peripheral
+ * @param[in]	- ENABLE or DISABLE
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
+{
+	if (EnOrDi == ENABLE) {
+		pSPIx->CR1 |= (1 << SPI_CR1_SPE);
+	} else {
+		pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
+	}
+}
