@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#define __vo volatile
+
 /*
  * Base addresses of Flash and SRAM memories
  */
@@ -133,7 +135,6 @@ typedef struct
 
 typedef struct
 {
-	//TODO
 	volatile uint32_t	CR1;
 	volatile uint32_t	CR2;
 	volatile uint32_t	OAR1;
@@ -146,6 +147,19 @@ typedef struct
 	volatile uint32_t	FLTR;
 }I2C_RegDef_t;
 
+
+typedef struct
+{
+	volatile uint32_t	CR1;		// Control 1
+	volatile uint32_t	CR2;		// Control 2
+	volatile uint32_t	SR;			// Status
+	volatile uint32_t	DR;			// Data
+	volatile uint32_t	CRCPR;		// CRC polynomial
+	volatile uint32_t	RXCRCR;		// RX CRC
+	volatile uint32_t	TXCRCR;		// TX CRC
+	volatile uint32_t	I2SCFGR;	// I2S config
+	volatile uint32_t	I2SSPR;		// I2S prescaler
+} SPI_RegDef_t;
 
 /*
  * Peripheral definitions (Peripheral base addresses typecasted to xxx_RegDef_t)
@@ -167,11 +181,14 @@ typedef struct
 #define I2C2		((I2C_RegDef_t*) I2C2_BASEADDR)
 #define I2C3		((I2C_RegDef_t*) I2C3_BASEADDR)
 
+#define SPI1		((SPI_RegDef_t*) SPI1_BASEADDR)
+#define SPI2		((SPI_RegDef_t*) SPI2_BASEADDR)
+#define SPI3		((SPI_RegDef_t*) SPI3_BASEADDR)
+
 
 /*TODO
  * Clock Enable Macros for GPIOx peripherals
  */
-
 #define GPIOA_PCLK_EN()			(RCC->AHB1ENR |= (1 << 0))
 #define GPIOB_PCLK_EN()			(RCC->AHB1ENR |= (1 << 1))
 
@@ -183,12 +200,13 @@ typedef struct
 #define I2C2_PCLK_EN()			(RCC->APB1ENR |= (1 << 22))
 #define I2C3_PCLK_EN()			(RCC->APB1ENR |= (1 << 23))
 
-
-/*TODO
+/*
  * Clock Enable Macros for SPIx peripherals
  */
-
-#define SPI1_PCLK_EN()			(RCC->APB1ENR |= (1 << 12))
+#define SPI1_PCLK_EN()		(RCC->APB2ENR |= (1 << 12))
+#define SPI2_PCLK_EN()		(RCC->APB1ENR |= (1 << 14))
+#define SPI3_PCLK_EN()		(RCC->APB1ENR |= (1 << 15))
+#define SPI4_PCLK_EN()		(RCC->APB2ENR |= (1 << 13))
 
 
 /*TODO
@@ -220,6 +238,14 @@ typedef struct
 #define I2C2_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 22))
 #define I2C3_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 23))
 
+/*
+ * Clock Disable Macros for SPIx peripherals
+ */
+#define SPI1_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 12))
+#define SPI2_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 14))
+#define SPI3_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 15))
+#define SPI4_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 13))
+
 
 /*
  * Macros to reset GPIOx peripherals
@@ -227,6 +253,12 @@ typedef struct
 #define GPIOA_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 0)); (RCC->AHB1RSTR &= ~(1 << 0)); }while(0)
 #define GPIOB_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 1)); (RCC->AHB1RSTR &= ~(1 << 1)); }while(0)
 #define GPIOC_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 2)); (RCC->AHB1RSTR &= ~(1 << 2)); }while(0)
+
+/*
+ *TODO
+ * IRQ (Interrupt Request) Numbers of STM32F429x MCU
+ */
+
 
 // Some generic macros
 
