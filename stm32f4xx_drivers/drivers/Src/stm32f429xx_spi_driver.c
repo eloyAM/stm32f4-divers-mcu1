@@ -115,3 +115,40 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
 		SPI4_REG_RESET();
 	}
 }
+
+/*
+ * SPI send data
+ */
+/*
+ * @fn			- SPI_SendData
+ *
+ * @brief		-
+ *
+ * @param[in]	- base address of the SPI peripheral
+ * @param[in]	- pointer to the buffer with the data to send
+ * @param[in]	- number of bytes to send
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
+{
+	while (Len > 0)
+	{
+		// 1. wait until TX buffer is empty
+		while (!(pSPIx->SR & (1 << SPI_SR_TXE))) {}
+		// 2. check the DFF (data frame format) 8/16 bits
+		if (pSPIx->CR1 & (1 << SPI_CR1_DFF)) {
+			// 16 bits DFF
+			pSPIx->DR = *((uint16_t*)pTxBuffer);
+			Len -= 2;
+			(uint16_t*) pTxBuffer++;
+		} else {
+			// 8 bits DFF
+			pSPIx->DR = *pTxBuffer;
+			Len--;
+			pTxBuffer++;
+		}
+	}
+}
+
