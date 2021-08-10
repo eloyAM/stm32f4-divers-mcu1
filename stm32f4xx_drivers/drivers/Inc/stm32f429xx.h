@@ -184,6 +184,7 @@ typedef struct
 #define SPI1		((SPI_RegDef_t*) SPI1_BASEADDR)
 #define SPI2		((SPI_RegDef_t*) SPI2_BASEADDR)
 #define SPI3		((SPI_RegDef_t*) SPI3_BASEADDR)
+#define SPI4		((SPI_RegDef_t*) SPI4_BASEADDR)
 
 
 /*TODO
