@@ -226,3 +226,41 @@ void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 		pSPIx->CR1 &= ~(1 << SPI_CR2_SSOE);
 	}
 }
+
+
+/*
+ * SPI receive data
+ */
+/*
+ * @fn			- SPI_ReceiveData
+ *
+ * @brief		-
+ *
+ * @param[in]	- base address of the SPI peripheral
+ * @param[in]	- pointer to the buffer to store the data
+ * @param[in]	- number of bytes to send
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t Len)
+{
+	while (Len > 0)
+	{
+		// 1. wait until RX buffer is empty
+		while (!(pSPIx->SR & (1 << SPI_SR_RXNE))) {}
+		// 2. check the DFF (data frame format) 8/16 bits
+		if (pSPIx->CR1 & (1 << SPI_CR1_DFF)) {
+			// 16 bits DFF
+			*((uint16_t*)pRxBuffer) = pSPIx->DR;
+			Len -= 2;
+			(uint16_t*) pRxBuffer++;
+		} else {
+			// 8 bits DFF
+			*pRxBuffer = pSPIx->DR;
+			Len--;
+			pRxBuffer++;
+		}
+	}
+}
+
