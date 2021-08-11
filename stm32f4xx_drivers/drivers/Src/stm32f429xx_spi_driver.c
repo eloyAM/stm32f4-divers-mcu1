@@ -175,6 +175,8 @@ void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 	if (EnOrDi == ENABLE) {
 		pSPIx->CR1 |= (1 << SPI_CR1_SPE);
 	} else {
+		// wait until peripheral is not busy
+		while (! (SPI2->SR & (1 << SPI_SR_BSY)) ) {};
 		pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
 	}
 }
@@ -199,5 +201,28 @@ void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 		pSPIx->CR1 |= (1 << SPI_CR1_SSI);
 	} else {
 		pSPIx->CR1 &= ~(1 << SPI_CR1_SSI);
+	}
+}
+
+/*
+ * SPI SSOE control
+ */
+/*
+ * @fn			- SPI_SSOEControl
+ *
+ * @brief		-
+ *
+ * @param[in]	- base address of the SPI peripheral
+ * @param[in]	- ENABLE or DISABLE
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
+{
+	if (EnOrDi == ENABLE) {
+		pSPIx->CR2 |= (1 << SPI_CR2_SSOE);
+	} else {
+		pSPIx->CR1 &= ~(1 << SPI_CR2_SSOE);
 	}
 }
