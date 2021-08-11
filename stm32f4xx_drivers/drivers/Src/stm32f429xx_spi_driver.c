@@ -1,5 +1,8 @@
 #include "stm32f429xx_spi_driver.h"
 
+static void spi_txe_interrupt_handle(SPI_Handle_t *pHandle);
+static void spi_rxne_interrupt_handle(SPI_Handle_t *pHandle);
+static void spi_ovr_interrupt_handle(SPI_Handle_t *pHandle);
 
 /*
  * @fn			- SPI_Init
@@ -332,4 +335,131 @@ uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Le
 	}
 
 	return state;
+}
+
+/*
+ * SPI interruption request handling
+ */
+/*
+ * @fn			- SPI_IRQHandling
+ *
+ * @brief		-
+ *
+ * @param[in]	- pointer to SPI handler
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void SPI_IRQHandling(SPI_Handle_t *pHandle)
+{
+	uint8_t temp1, temp2;
+
+	// Check for TXE
+	temp1 = pHandle->pSPIx->SR & (1 << SPI_SR_TXE);
+	temp2 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_TXEIE); // is Tx interrupt enabled?
+	if (temp1 && temp2) {
+		// Handle TXE
+		spi_txe_interrupt_handle(pHandle);
+	}
+
+	// Check for RXNE
+	temp1 = pHandle->pSPIx->SR & (1 << SPI_SR_RXNE);
+	temp2 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_RXNEIE); // is Rx interrupt enabled?
+	if (temp1 && temp2) {
+		// Handle RXE
+		spi_rxne_interrupt_handle(pHandle);
+	}
+
+	// Check for OVR
+	temp1 = pHandle->pSPIx->SR & (1 << SPI_SR_OVR);
+	temp2 = pHandle->pSPIx->CR2 & (1 << SPI_CR2_ERRIE); // is error interrupt enabled?
+	if (temp1 && temp2) {
+		// Handle OVR
+		spi_ovr_interrupt_handle(pHandle);
+	}
+}
+
+void SPI_CloseTransmission(SPI_Handle_t *pHandle)
+{
+	pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_TXEIE);
+	pHandle->pTxBuffer = NULL;
+	pHandle->TxLen = 0;
+	pHandle->TxState = SPI_READY;
+}
+
+void SPI_CloseReception(SPI_Handle_t *pHandle)
+{
+	pHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_RXNEIE);
+	pHandle->pRxBuffer = NULL;
+	pHandle->RxLen = 0;
+	pHandle->RxState = SPI_READY;
+}
+
+__attribute__((weak)) void SPI_ApplicationEventCallback(SPI_Handle_t *pHandle, uint8_t AppEv)
+{
+	// This is a weak (default) implementation
+	// The user may override this function
+}
+
+static void spi_txe_interrupt_handle(SPI_Handle_t *pHandle)
+{
+	// check the DFF (data frame format) 8/16 bits
+	if (pHandle->pSPIx->CR1 & (1 << SPI_CR1_DFF)) {
+		// 16 bits DFF
+		pHandle->pSPIx->DR = *((uint16_t*)pHandle->pTxBuffer);
+		pHandle->TxLen -= 2;
+		(uint16_t*) pHandle->pTxBuffer++;
+	} else {
+		// 8 bits DFF
+		pHandle->pSPIx->DR = *pHandle->pTxBuffer;
+		pHandle->TxLen--;
+		pHandle->pTxBuffer++;
+	}
+
+	if (! pHandle->TxLen) {
+		// TxLen is zero, close the transmission and notify
+
+		// this prevents interrupts from setting up of TXE flag
+		SPI_CloseTransmission(pHandle);
+		SPI_ApplicationEventCallback(pHandle, SPI_EVENT_TX_CMPLT);
+	}
+}
+
+
+static void spi_rxne_interrupt_handle(SPI_Handle_t *pHandle)
+{
+	// check the DFF (data frame format) 8/16 bits
+	if (pHandle->pSPIx->CR1 & (1 << SPI_CR1_DFF)) {
+		// 16 bits DFF
+		*((uint16_t*)pHandle->pRxBuffer) = pHandle->pSPIx->DR;
+		pHandle->RxLen -= 2;
+		(uint16_t*) pHandle->pRxBuffer++;
+	} else {
+		// 8 bits DFF
+		*pHandle->pRxBuffer = pHandle->pSPIx->DR;
+		pHandle->RxLen--;
+		pHandle->pRxBuffer++;
+	}
+
+	if (! pHandle->RxLen) {
+		// TxLen is zero, close the transmission and notify
+
+		// this prevents interrupts from setting up of RXNE flag
+		SPI_CloseReception(pHandle);
+		SPI_ApplicationEventCallback(pHandle, SPI_EVENT_RX_CMPLT);
+	}
+}
+
+
+static void spi_ovr_interrupt_handle(SPI_Handle_t *pHandle)
+{
+	uint8_t temp;
+	// Clear OVR flag (automatically by reading SPI_DR and then SPI_SR)
+	if (pHandle->TxState != SPI_BUSY_IN_TX) {
+		temp = pHandle->pSPIx->DR;
+		temp = pHandle->pSPIx->SR;
+	}
+	(void)temp;	// avoid unused warning / optimizations
+	// Notify
+	SPI_ApplicationEventCallback(pHandle, SPI_EVENT_OVR_ERR);
 }
