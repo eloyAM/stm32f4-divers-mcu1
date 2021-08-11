@@ -264,3 +264,72 @@ void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t Len)
 	}
 }
 
+/*
+ * SPI send data (interrupt based)
+ */
+/*
+ * @fn			- SPI_SendDataIT
+ *
+ * @brief		-
+ *
+ * @param[in]	- pointer to SPI handler
+ * @param[in]	- pointer to the buffer with the data to send
+ * @param[in]	- number of bytes to send
+ * @return		- SPI Tx state
+ *
+ * @Note		- none
+ */
+uint8_t SPI_SendDataIT(SPI_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
+{
+	uint8_t state = pHandle->TxState;
+
+	if (state != SPI_BUSY_IN_TX)
+	{
+		// 1. Save the Tx buffer addr and len info in some global vars
+		pHandle->pTxBuffer = pTxBuffer;
+		pHandle->TxLen = Len;
+		// 2. Mark the SPI state as busy in transmission so that
+		// no other code can take over same SPI peripheral until transmission is over
+		pHandle->TxState = SPI_BUSY_IN_TX;
+		// 3. Enable the TXEIE control bit to get interrupt whenever the TXE is set in SR
+		pHandle->pSPIx->CR2 |= (1 << SPI_CR2_TXEIE);
+		// 4. Data transmission will be handled by the ISR code
+	}
+
+	return state;
+}
+
+/*
+ * SPI receive data (interrupt based)
+ */
+/*
+ * @fn			- SPI_ReceiveDataIT
+ *
+ * @brief		-
+ *
+ * @param[in]	- pointer to SPI handler
+ * @param[in]	- pointer to the buffer to store the data
+ * @param[in]	- number of bytes to send
+ * @return		- SPI Rx state
+ *
+ * @Note		- none
+ */
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len)
+{
+	uint8_t state = pHandle->RxState;
+
+	if (state != SPI_BUSY_IN_RX)
+	{
+		// 1. Save the Rx buffer addr and len info in some global vars
+		pHandle->pRxBuffer = pRxBuffer;
+		pHandle->RxLen = Len;
+		// 2. Mark the SPI state as busy in transmission so that
+		// no other code can take over same SPI peripheral until transmission is over
+		pHandle->RxState = SPI_BUSY_IN_RX;
+		// 3. Enable the RXEIE control bit to get interrupt whenever the RXE is set in SR
+		pHandle->pSPIx->CR2 |= (1 << SPI_CR2_RXNEIE);
+		// 4. Data transmission will be handled by the ISR code
+	}
+
+	return state;
+}
