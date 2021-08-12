@@ -161,6 +161,18 @@ typedef struct
 	volatile uint32_t	I2SSPR;		// I2S prescaler
 } SPI_RegDef_t;
 
+
+typedef struct
+{
+	volatile uint32_t	SR;			// Status
+	volatile uint32_t	DR;			// Data
+	volatile uint32_t	BRRR;		// Baud rate
+	volatile uint32_t	CR1;		// Control 1
+	volatile uint32_t	CR2;		// Control 2
+	volatile uint32_t	CR3;		// Control 3
+	volatile uint32_t	GTPR;		// Guard time and prescaler
+} USART_RegDef_t;
+
 /*
  * Peripheral definitions (Peripheral base addresses typecasted to xxx_RegDef_t)
  */
