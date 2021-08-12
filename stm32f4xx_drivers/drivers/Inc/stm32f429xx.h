@@ -227,12 +227,17 @@ typedef struct
 #define SPI4_PCLK_EN()		(RCC->APB2ENR |= (1 << 13))
 
 
-/*TODO
+/*
  * Clock Enable Macros for USARTx peripherals
  */
-
-#define USART1_PCLK_EN()		(RCC->APB2ENR |= (1 << 5))
-
+#define USART1_PCLK_EN()		(RCC->APB2ENR |= (1 << 4))
+#define USART2_PCLK_EN()		(RCC->APB1ENR |= (1 << 17))
+#define USART3_PCLK_EN()		(RCC->APB1ENR |= (1 << 18))
+#define UART4_PCLK_EN()			(RCC->APB1ENR |= (1 << 19))
+#define UART5_PCLK_EN()			(RCC->APB1ENR |= (1 << 20))
+#define USART6_PCLK_EN()		(RCC->APB2ENR |= (1 << 5))
+#define UART7_PCLK_EN()			(RCC->APB1ENR |= (1 << 30))
+#define UART8_PCLK_EN()			(RCC->APB1ENR |= (1 << 31))
 
 /*
  * Clock Enable Macro for SYSCFG peripheral
@@ -263,6 +268,18 @@ typedef struct
 #define SPI2_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 14))
 #define SPI3_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 15))
 #define SPI4_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 13))
+
+/*
+ * Clock Disable Macros for USARTx peripherals
+ */
+#define USART1_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 4))
+#define USART2_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 17))
+#define USART3_PCLK_DI()		(RCC->APB1ENR &= ~(1 << 18))
+#define UART4_PCLK_DI()			(RCC->APB1ENR &= ~(1 << 19))
+#define UART5_PCLK_DI()			(RCC->APB1ENR &= ~(1 << 20))
+#define USART6_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 5))
+#define UART7_PCLK_DI()			(RCC->APB1ENR &= ~(1 << 30))
+#define UART8_PCLK_DI()			(RCC->APB1ENR &= ~(1 << 31))
 
 
 /*
