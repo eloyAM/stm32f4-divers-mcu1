@@ -1,6 +1,8 @@
 #ifndef INC_STM32F429XX_USART_DRIVER_H_
 #define INC_STM32F429XX_USART_DRIVER_H_
 
+#include "stm32f429xx.h"
+
 
 /*
  * Configuration structure for USART peripheral
