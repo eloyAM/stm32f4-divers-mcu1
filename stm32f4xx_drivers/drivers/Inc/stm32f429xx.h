@@ -298,6 +298,19 @@ typedef struct
 #define SPI4_REG_RESET()	do{ (RCC->APB2RSTR |= (1 << 13)); (RCC->APB2RSTR &= ~(1 << 13)); }while(0)
 
 /*
+ * Macros to reset SPIx peripherals
+ */
+#define USART1_REG_RESET()	do{ (RCC->APB2RSTR |= (1 << 4)); (RCC->APB2RSTR &= ~(1 << 4)); }while(0)
+#define USART2_REG_RESET()	do{ (RCC->APB1RSTR |= (1 << 17)); (RCC->APB1RSTR &= ~(1 << 17)); }while(0)
+#define USART3_REG_RESET()	do{ (RCC->APB1RSTR |= (1 << 18)); (RCC->APB1RSTR &= ~(1 << 18)); }while(0)
+#define UART4_REG_RESET()	do{ (RCC->APB1RSTR |= (1 << 19)); (RCC->APB1RSTR &= ~(1 << 19)); }while(0)
+#define UART5_REG_RESET()	do{ (RCC->APB1RSTR |= (1 << 20)); (RCC->APB1RSTR &= ~(1 << 20)); }while(0)
+#define USART6_REG_RESET()	do{ (RCC->APB2RSTR |= (1 << 5)); (RCC->APB2RSTR &= ~(1 << 5)); }while(0)
+#define USART7_REG_RESET()	do{ (RCC->APB1RSTR |= (1 << 30)); (RCC->APB1RSTR &= ~(1 << 30)); }while(0)
+#define USART8_REG_RESET()	do{ (RCC->APB1RSTR |= (1 << 31)); (RCC->APB1RSTR &= ~(1 << 31)); }while(0)
+
+
+/*
  *TODO
  * IRQ (Interrupt Request) Numbers of STM32F429x MCU
  */
