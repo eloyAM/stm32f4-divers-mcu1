@@ -69,3 +69,84 @@ void USART_DeInit(USART_RegDef_t *pUSARTx)
 		UART4_REG_RESET();
 	}
 }
+
+
+void USART_Init(USART_Handle_t *pHandle)
+{
+	uint32_t tempreg = 0;
+
+	// Enable peripheral clock
+	USART_PeriClockControl(pHandle->pUSARTx, ENABLE);
+
+	/********************
+	 * CR1 configuration
+	 *******************/
+
+	// Enable Tx and/or Rx according to the USART mode
+	if (pHandle->USARTConfig.USART_Mode == USART_MODE_ONLY_RX) {
+		tempreg |= (1 << USART_CR1_RE);
+	} else if (pHandle->USARTConfig.USART_Mode == USART_MODE_ONLY_TX) {
+		tempreg |= (1 << USART_CR1_TE);
+	} else if (pHandle->USARTConfig.USART_Mode == USART_MODE_TXRX) {
+		tempreg |= ( (1 << USART_CR1_RE) | (1 << USART_CR1_TE) );
+	}
+
+	// Choose word length
+	tempreg |= (pHandle->USARTConfig.USART_WordLength << USART_CR1_M);
+
+	// Choose parity control
+	if (pHandle->USARTConfig.USART_ParityControl == USART_PARITY_EN_EVEN) {
+		tempreg |= (1 << USART_CR1_PCE); // Enable parity control
+		// No need to reset USART_CR1_PS, default value (0) means even parity
+	} else if (pHandle->USARTConfig.USART_ParityControl == USART_PARITY_EN_ODD) {
+		tempreg |= (1 << USART_CR1_PCE); // Enable parity control
+		tempreg |= (1 << USART_CR1_PS); // Select odd parity
+	}
+
+	// Save CR1
+	pHandle->pUSARTx->CR1 = tempreg;
+
+	/*******************
+	 * CR2 configuration
+	 *******************/
+
+	tempreg = 0;
+
+	// Choose number of stop bits
+	tempreg |= (pHandle->USARTConfig.USART_NoOfStopBits << USART_CR2_STOP);
+
+	// Save CR2
+	pHandle->pUSARTx->CR2 = tempreg;
+
+	/********************
+	 * CR3 configuration
+	 *******************/
+
+	tempreg = 0;
+
+	// Choose hardware flow control
+	if (pHandle->USARTConfig.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS) {
+		tempreg |= (1 << USART_CR3_CTSE);
+	} else if (pHandle->USARTConfig.USART_HWFlowControl == USART_HW_FLOW_CTRL_RTS) {
+		tempreg |= (1 << USART_CR3_RTSE);
+	} else if (pHandle->USARTConfig.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS_RTS) {
+		tempreg |= ( (1 << USART_CR3_CTSE) | (1 << USART_CR3_RTSE) );
+	}
+
+	// Save CR3
+	pHandle->pUSARTx->CR3 = tempreg;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

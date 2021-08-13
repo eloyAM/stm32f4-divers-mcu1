@@ -11,7 +11,7 @@ typedef struct
 {
 	uint8_t USART_Mode;				// Transmit and/or receive
 	uint32_t USART_Baud;			// Up to 3Mbps
-	uint8_t USART_NoOfStopBits;		// Number of stop bits
+	uint8_t USART_NoOfStopBits;		// Number of stop bits. NOTE: 0.5 & 1.5 not available for UART4 & UART5.
 	uint8_t USART_WordLength;		// 8 or 9 bits
 	uint8_t USART_ParityControl;	// None/even/odd
 	uint8_t USART_HWFlowControl;	// None or CTS and/or RTS. NOTE: not available for UART4 & UART5
