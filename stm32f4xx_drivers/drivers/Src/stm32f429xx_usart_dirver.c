@@ -2,7 +2,7 @@
 
 
 /*
- * @fn			- USART_Init
+ * @fn			- USART_PeriClockControl
  *
  * @brief		- This function enables or disables peripheral clock for the given USART
  *
@@ -70,7 +70,17 @@ void USART_DeInit(USART_RegDef_t *pUSARTx)
 	}
 }
 
-
+/*
+ * @fn			- USART_Init
+ *
+ * @brief		- Initializes USART peripheral
+ *
+ * @param[in]	- pointer to USART handler
+ *
+ * @return		- none
+ *
+ * @Note		- none
+ */
 void USART_Init(USART_Handle_t *pHandle)
 {
 	uint32_t tempreg = 0;
