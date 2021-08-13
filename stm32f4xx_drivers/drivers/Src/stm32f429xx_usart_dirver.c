@@ -175,7 +175,7 @@ void USART_SendData(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
 		if (pHandle->USARTConfig.USART_WordLength == USART_WORDLEN_9BITS)
 		{
 			/*9 bit length word*/
-			// Load the DR with 2 bytes masking the non-relevant
+			// Load the DR with 2 bytes masking the non-relevant bits
 			pData = (uint16_t*) pTxBuffer;
 			pHandle->pUSARTx->DR = (*pData & (uint16_t)0x01FF);
 			// Check parity configuration
@@ -204,7 +204,58 @@ void USART_SendData(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
 	while (! (pHandle->pUSARTx->SR & (1 << USART_SR_TC))) {}
 }
 
+/*
+ * @fn			- USART_ReceiveData
+ *
+ * @brief		- Receives data
+ *
+ * @param[in]	- base address of the USART peripheral
+ * @param[in]	- pointer to buffer where to store the data
+ * @param[in]	- number of bytes to receive
+ *
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void USART_ReceiveData(USART_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len)
+{
+	for (uint32_t i = 0; i < Len; i++)
+	{
+		// Wait until received data is ready to be read
+		while (! (pHandle->pUSARTx->SR & (1 << USART_SR_RXNE))) {}
 
+		// Choose between 8 or 9 bits word length
+		if (pHandle->USARTConfig.USART_WordLength == USART_WORDLEN_9BITS)
+		{
+			/*9 BIT OF WORD LENGTH*/
+			// Check parity configuration
+			if (pHandle->USARTConfig.USART_ParityControl == USART_PARITY_DISABLE) {
+				// No parity. The 9 bits will be useful data
+				// 2 bytes are consumed
+				*( (uint16_t*) pRxBuffer) = (pHandle->pUSARTx->DR & (uint16_t)0x01FF);
+				pRxBuffer += 2;
+			} else {
+				// Parity. 8 bits of useful data, the 9th will be replaced by hardware
+				// 1 byte is consumed
+				*pRxBuffer = (pHandle->pUSARTx->DR & (uint8_t)0x01FF);
+				pRxBuffer++;
+			}
+		}
+		else
+		{
+			/*8 BITS OF WORD LENGTH*/
+			// Check parity configuration
+			if (pHandle->USARTConfig.USART_ParityControl == USART_PARITY_DISABLE) {
+				// Normal read of 8 bits
+				*pRxBuffer = pHandle->pUSARTx->DR;
+			} else {
+				// Discard the 8th bit (used as parity control)
+				*pRxBuffer = (pHandle->pUSARTx->DR & (uint8_t)0x7F);
+			}
+			pRxBuffer++;
+		}
+	}
+}
 
 
 
