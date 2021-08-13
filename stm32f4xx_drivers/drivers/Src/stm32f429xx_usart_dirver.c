@@ -149,8 +149,60 @@ void USART_Init(USART_Handle_t *pHandle)
 
 
 
+/*
+ * @fn			- USART_SendData
+ *
+ * @brief		- Sends data
+ *
+ * @param[in]	- base address of the USART peripheral
+ * @param[in]	- pointer to buffer with the data to send
+ * @param[in]	- number of bytes to send
+ *
+ * @return		- none
+ *
+ * @Note		- none
+ */
+void USART_SendData(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
+{
+	uint16_t *pData;
 
+	for (uint32_t i = 0; i < Len; i++)
+	{
+		// Wait until transmit data registry is empty
+		while (! (pHandle->pUSARTx->SR & ~(1 << USART_SR_TXE))) {}
 
+		// Choose between 8 and 9 bits word length
+		if (pHandle->USARTConfig.USART_WordLength == USART_WORDLEN_9BITS)
+		{
+			/*9 bit length word*/
+			// Load the DR with 2 bytes masking the non-relevant
+			pData = (uint16_t*) pTxBuffer;
+			pHandle->pUSARTx->DR = (*pData & (uint16_t)0x01FF);
+			// Check parity configuration
+			if (pHandle->USARTConfig.USART_ParityControl == USART_PARITY_DISABLE) {
+				// No parity. The 9 bits will be useful data
+				// 2 bytes are consumed
+				pTxBuffer += 2;
+			} else {
+				// Parity. 8 bits of useful data, the 9th will be replaced by hardware
+				// 1 byte is consumed
+				pTxBuffer++;
+			}
+		}
+		else
+		{
+			/*8 bit length word*/
+			pHandle->pUSARTx->DR = *pTxBuffer;
+
+			// No need to check the parity configuration
+			// The hardware will automatically replace the 8th bit if needed
+			pTxBuffer++;
+		}
+	}
+
+	// Wait until transmission is set as completed
+	while (! (pHandle->pUSARTx->SR & ~(1 << USART_SR_TC))) {}
+}
 
 
 
