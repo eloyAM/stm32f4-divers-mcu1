@@ -24,6 +24,12 @@ typedef struct
 {
 	USART_RegDef_t 	*pUSARTx;	// Base address of USARTx
 	USART_Config_t	USARTConfig;
+	uint8_t			*pTxBuffer;	// To store the app Tx buffer addr
+	uint8_t			*pRxBuffer;	// To store the app Rx buffer addr
+	uint32_t		TxLen;		// To store Tx len
+	uint32_t		RxLen;		// To store Rx len
+	uint8_t			TxState;	// To store Tx state
+	uint8_t			RxState;	// To store Rx state
 } USART_Handle_t;
 
 
@@ -80,6 +86,13 @@ typedef struct
 #define USART_HW_FLOW_CTRL_RTS		2
 #define USART_HW_FLOW_CTRL_CTS_RTS	3
 
+/*
+ * SPI application states
+ */
+#define USART_READY			0
+#define USART_BUSY_IN_RX	1
+#define USART_BUSY_IN_TX	2
+
 
 /******************************************************************************************
  *								APIs supported by this driver
@@ -101,8 +114,8 @@ void USART_DeInit(USART_RegDef_t *pUSARTx);
  */
 void USART_SendData(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len);
 void USART_ReceiveData(USART_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len);
-void USART_SendDataIT(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len);
-void USART_ReceiveDataIT(USART_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len);
+uint8_t USART_SendDataIT(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len);
+uint8_t USART_ReceiveDataIT(USART_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len);
 
 /*
  * IRQ Configuration and ISR handling

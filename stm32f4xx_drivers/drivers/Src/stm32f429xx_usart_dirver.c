@@ -257,9 +257,71 @@ void USART_ReceiveData(USART_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len
 	}
 }
 
+/*
+ * @fn			- USART_SendDataIT
+ *
+ * @brief		- Sends data - interruption based
+ *
+ * @param[in]	- pointer to USART handler
+ * @param[in]	- pointer to buffer with the data to send
+ * @param[in]	- number of bytes to send
+ *
+ * @return		- none
+ *
+ * @Note		- none
+ */
+uint8_t USART_SendDataIT(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
+{
+	uint8_t TxState = pHandle->TxState;
+
+	if (TxState != USART_BUSY_IN_TX)
+	{
+		// Save fields
+		pHandle->TxLen = Len;
+		pHandle->pTxBuffer = pTxBuffer;
+		// Indicate state as busy transmitting
+		pHandle->TxState = USART_BUSY_IN_TX;
+
+		// Enable interrupt for TXE
+		pHandle->pUSARTx->CR1 |= (1 << USART_CR1_TXEIE);
+
+		// Enable interrupt for TC
+		pHandle->pUSARTx->CR1 |= (1 << USART_CR1_TCIE);
+	}
+
+	return TxState;
+}
 
 
+/*
+ * @fn			- USART_ReceiveDataIT
+ *
+ * @brief		- Receives data - interruption based
+ *
+ * @param[in]	- pointer to USART handler
+ * @param[in]	- pointer to buffer where to store the data
+ * @param[in]	- number of bytes to receive
+ *
+ * @return		- none
+ *
+ * @Note		- none
+ */
+uint8_t USART_ReceiveDataIT(USART_Handle_t *pHandle, uint8_t *pRxBuffer, uint32_t Len)
+{
+	uint8_t RxState = pHandle->TxState;
 
+	if (RxState != USART_BUSY_IN_RX)
+	{
+		// Save fields
+		pHandle->RxLen = Len;
+		pHandle->pRxBuffer = pRxBuffer;
+		// Indicate state as busy transmitting
+		pHandle->RxState = USART_BUSY_IN_RX;
 
+		// Enable interrupt for RXNE
+		pHandle->pUSARTx->CR1 |= (1 << USART_CR1_RXNEIE);
+	}
 
+	return RxState;
+}
 
