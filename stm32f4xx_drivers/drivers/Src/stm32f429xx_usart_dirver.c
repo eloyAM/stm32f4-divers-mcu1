@@ -169,7 +169,7 @@ void USART_SendData(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
 	for (uint32_t i = 0; i < Len; i++)
 	{
 		// Wait until transmit data registry is empty
-		while (! (pHandle->pUSARTx->SR & ~(1 << USART_SR_TXE))) {}
+		while (! (pHandle->pUSARTx->SR & (1 << USART_SR_TXE))) {}
 
 		// Choose between 8 and 9 bits word length
 		if (pHandle->USARTConfig.USART_WordLength == USART_WORDLEN_9BITS)
@@ -201,7 +201,7 @@ void USART_SendData(USART_Handle_t *pHandle, uint8_t *pTxBuffer, uint32_t Len)
 	}
 
 	// Wait until transmission is set as completed
-	while (! (pHandle->pUSARTx->SR & ~(1 << USART_SR_TC))) {}
+	while (! (pHandle->pUSARTx->SR & (1 << USART_SR_TC))) {}
 }
 
 
