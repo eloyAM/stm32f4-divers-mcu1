@@ -479,4 +479,11 @@ typedef struct
 #define USART_CR3_CTSIE		10
 #define USART_CR3_ONEBIT	11
 
+
+#include "stm32f429_gpio_driver.h"
+#include "stm32f429xx_spi_driver.h"
+#include "stm32f429_i2c_driver.h"
+#include "stm32f429xx_usart_driver.h"
+#include "stm32f429xx_rcc_driver.h"
+
 #endif /* INC_STM32F429XX_H_ */
