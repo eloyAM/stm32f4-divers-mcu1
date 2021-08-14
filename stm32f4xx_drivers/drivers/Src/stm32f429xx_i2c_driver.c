@@ -41,7 +41,7 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 	pI2CHandle->pI2Cx->CR1 = tempreg;
 	// Configure the FREQ field of CR2
 	tempreg = 0;
-	tempreg = RCC_GetPCKL1Value() / 1000000U;
+	tempreg = RCC_GetPCLK1Value() / 1000000U;
 	pI2CHandle->pI2Cx->CR2 = (tempreg & 0xF3);
 	// Program the device own address
 	tempreg = 0;
@@ -53,15 +53,15 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 	tempreg = 0;
 	if (pI2CHandle->I2C_Config.I2C_SCLSpeed <= I2C_SCL_SPEED_SM) {
 		// Standard mode
-		ccr_value = (RCC_GetPCKL1Value() / (2 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
+		ccr_value = (RCC_GetPCLK1Value() / (2 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
 	} else {
 		// Fast mode
 		tempreg |= (1 << 15);
 		tempreg |= (pI2CHandle->I2C_Config.I2C_FMDutyCycle << 14);
 		if (pI2CHandle->I2C_Config.I2C_FMDutyCycle == I2C_FM_DUTY_2) {
-			ccr_value = (RCC_GetPCKL1Value() / (3 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
+			ccr_value = (RCC_GetPCLK1Value() / (3 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
 		} else {
-			ccr_value = (RCC_GetPCKL1Value() / (25 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
+			ccr_value = (RCC_GetPCLK1Value() / (25 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
 		}
 	}
 	tempreg |= (ccr_value & 0xFFF);
@@ -70,10 +70,10 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 	// TRISE configuration
 	if (pI2CHandle->I2C_Config.I2C_SCLSpeed <= I2C_SCL_SPEED_SM) {
 		// Standard mode
-		tempreg = (RCC_GetPCKL1Value() / 1000000U) + 1;
+		tempreg = (RCC_GetPCLK1Value() / 1000000U) + 1;
 	} else {
 		// Fast mode
-		tempreg = ((RCC_GetPCKL1Value() * 300) / 1000000000U) + 1;
+		tempreg = ((RCC_GetPCLK1Value() * 300) / 1000000000U) + 1;
 	}
 	pI2CHandle->pI2Cx->TRISE = (tempreg & 0x3F); // TRISE takes last 6 bits (0x3F = 11 1111)
 }

@@ -10,7 +10,7 @@ uint32_t RCC_GetPLLOutputClock(void)
 	return 0;
 }
 
-uint32_t RCC_GetPCKL1Value(void)
+uint32_t RCC_GetPCLK1Value(void)
 {
 	uint32_t pckl1, SystemClk;
 	uint8_t clksrc, temp, ahbp, apb1p;
@@ -40,5 +40,5 @@ uint32_t RCC_GetPCKL1Value(void)
 	return pckl1;
 }
 
-// TODO Use as reference RCC_GetPCKL1Value(void)
-uint32_t RCC_GetPCKL2Value(void);
+// TODO Use as reference RCC_GetPCLK1Value(void)
+uint32_t RCC_GetPCLK2Value(void);
