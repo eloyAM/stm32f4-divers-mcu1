@@ -166,7 +166,7 @@ typedef struct
 {
 	volatile uint32_t	SR;			// Status
 	volatile uint32_t	DR;			// Data
-	volatile uint32_t	BRRR;		// Baud rate
+	volatile uint32_t	BRR;		// Baud rate
 	volatile uint32_t	CR1;		// Control 1
 	volatile uint32_t	CR2;		// Control 2
 	volatile uint32_t	CR3;		// Control 3
@@ -202,6 +202,8 @@ typedef struct
 #define USART2		((USART_RegDef_t*) USART2_BASEADDR)
 #define USART3		((USART_RegDef_t*) USART3_BASEADDR)
 #define UART4		((USART_RegDef_t*) UART4_BASEADDR)
+#define UART5		((USART_RegDef_t*) UART5_BASEADDR)
+#define USART6		((USART_RegDef_t*) USART6_BASEADDR)
 
 
 
