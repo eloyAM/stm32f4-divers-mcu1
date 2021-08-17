@@ -145,6 +145,9 @@ void USART_Init(USART_Handle_t *pHandle)
 
 	// Save CR3
 	pHandle->pUSARTx->CR3 = tempreg;
+
+	// Configure baud rate
+	USART_SetBaudRate(pHandle->pUSARTx, pHandle->USARTConfig.USART_Baud);
 }
 
 
