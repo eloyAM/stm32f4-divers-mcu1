@@ -1,5 +1,8 @@
 #include "stm32f429xx_usart_driver.h"
 
+static void usart_interrupt_handle_tc(USART_Handle_t *pHandle);
+static void usart_interrupt_handle_txe(USART_Handle_t *pHandle);
+static void usart_interrupt_handle_rxne(USART_Handle_t *pHandle);
 
 /*
  * @fn			- USART_PeriClockControl
@@ -394,4 +397,34 @@ void USART_SetBaudRate(USART_RegDef_t *pUSARTx, uint32_t BaudRate)
 }
 
 
+void USART_IRQHandling(USART_Handle_t *pHandle)
+{
+	uint32_t temp1, temp2;
 
+	// Check for "Transmission Complete" (TC) flag
+	temp1 = pHandle->pUSARTx->SR & (1 << USART_SR_TC);
+	// Check for "Transmission Complete Interrupt Enable" (TCIE) flag
+	temp2 = pHandle->pUSARTx->CR1 & (1 << USART_CR1_TCIE);
+	// Handle TC
+	if (temp1 && temp2) {
+		usart_interrupt_handle_tc(pHandle);
+	}
+
+	// Check for "Transmit Data Register Empty" (TXE) flag
+	temp1 = pHandle->pUSARTx->SR & (1 << USART_SR_TXE);
+	// Check for "Transmit Data Register Empty Interrupt Enable" (TXEIE) flag
+	temp2 = pHandle->pUSARTx->CR1 & (1 << USART_CR1_TXEIE);
+	// Handle TXE
+	if (temp1 && temp2) {
+		usart_interrupt_handle_txe(pHandle);
+	}
+
+	// Check for "Received Data Ready to be Read" (RXNE) flag
+	temp1 = pHandle->pUSARTx->SR & (1 << USART_SR_RXNE);
+	// Check for "Received Data Ready to be Read Interrupt Enable" (RXNEIE) flag
+	temp2 = pHandle->pUSARTx->CR1 & (1 << USART_CR1_RXNEIE);
+	// Handle RXNE
+	if (temp1 && temp2) {
+		usart_interrupt_handle_rxne(pHandle);
+	}
+}
