@@ -42,6 +42,14 @@ typedef struct
 	uint8_t time_format;
 } RTC_time_t;
 
+typedef struct
+{
+	uint8_t date;
+	uint8_t month;
+	uint8_t year;
+	uint8_t day;
+} RTC_date_t;
+
 
 /* Function prototypes */
 uint8_t ds1307_init(void);
@@ -49,8 +57,8 @@ uint8_t ds1307_init(void);
 void ds1307_set_current_time(RTC_time_t *);
 void ds1307_get_current_time(RTC_time_t *);
 
-void ds1307_set_current_date(RTC_time_t *);
-void ds1307_get_current_date(RTC_time_t *);
+void ds1307_set_current_date(RTC_date_t *);
+void ds1307_get_current_date(RTC_date_t *);
 
 
 #endif /* DS1307_H_ */
