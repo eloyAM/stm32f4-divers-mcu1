@@ -9,7 +9,7 @@ static void lcd_enable(void);
 
 void lcd_init(void)
 {
-	// 1. Configure the gpio pins wich are used for LCD connections
+	// 1. Configure the GPIO pins which are used for LCD connections
 	GPIO_Handle_t lcd_signal;
 
 	lcd_signal.pGPIOx = LCD_GPIO_PORT;

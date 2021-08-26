@@ -1,5 +1,8 @@
 #include <stdio.h>
+
+///*
 #include "ds1307.h"
+#include "lcd.h"
 
 #define SYSTICK_TIM_CLK	16000000UL
 
@@ -12,12 +15,28 @@ char *date_to_string(RTC_date_t *rtc_date);
 void init_systick_timer(uint32_t tick_hz);
 
 
+static void mdelay(uint32_t milis)
+{
+	for (int i = 0; i < (milis * 1000); ++i) {
+		// Nothing, just increment var
+	}
+}
+
+
 int main017rtc_lcd(void)
 {
 	RTC_time_t current_time;
 	RTC_date_t current_date;
 
 	printf("RTC test\n");
+
+	lcd_init();
+
+	lcd_print_string("RTC Test...");
+
+	mdelay(2000);
+	lcd_display_clear();
+	lcd_display_return_home();
 
 	if (ds1307_init()) {
 		printf("RTC init has failed\n");
@@ -92,8 +111,8 @@ char *date_to_string(RTC_date_t *rtc_date)
 
 void init_systick_timer(uint32_t tick_hz)
 {
-	uint32_t *pSRVR = (uint32_t)0xE000E014;
-	uint32_t *pSCSR = (uint32_t)0xE000E010;
+	uint32_t *pSRVR = (uint32_t*)0xE000E014;
+	uint32_t *pSCSR = (uint32_t*)0xE000E010;
 
 	// Calculation of reload value
 	uint32_t count_value = (SYSTICK_TIM_CLK/tick_hz)-1;
@@ -120,14 +139,22 @@ void SysTick_Handler(void)
 
 	ds1307_get_current_time(&current_time);
 
+	lcd_set_cursor(1, 1);
+
 	char *am_pm;
 	if (current_time.time_format != TIME_FORMAT_24HRS) {
 		am_pm = (current_time.time_format) ? "PM" :"AM";
-		printf("Current time = %s %s\n", time_to_string(&current_time), am_pm);
+//		printf("Current time = %s %s\n", time_to_string(&current_time), am_pm);
+		lcd_print_string(time_to_string(&current_time));
+		lcd_print_string(am_pm);
 	} else {
-		printf("Current time = %s\n", time_to_string(&current_time));
+//		printf("Current time = %s\n", time_to_string(&current_time));
+		lcd_print_string(time_to_string(&current_time));
 	}
 
 	ds1307_get_current_date(&current_date);
-	printf("Current date = %s <%s>\n", date_to_string(&current_date), get_day_of_week(current_date.day));
+//	printf("Current date = %s <%s>\n", date_to_string(&current_date), get_day_of_week(current_date.day));
+	lcd_set_cursor(2, 1);
+	lcd_print_string(date_to_string(&current_date));
 }
+//*/
